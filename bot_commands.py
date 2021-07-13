@@ -4,7 +4,7 @@ from discord.ext import commands
 
 ROOT_PATH = os.curdir
 audio_files = f'{ROOT_PATH}/audio/'
-client = commands.Bot(command_prefix='>')
+client = commands.Bot(command_prefix='natan ')
 
 @client.command()
 async def play(ctx, url:str):

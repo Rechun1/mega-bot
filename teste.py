@@ -29,7 +29,7 @@ async def play(ctx, url:str):
         await voice_channel.connect()
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
         print(voice)
-        voice.play(discord.FFmpegPCMAudio(f'{audio_files}/Zé.mp3'))
+        voice.play(discord.FFmpegPCMAudio(f'{audio_files}/xenia.mp3'))
     else:
         await ctx.send(f'Deu erro aqui caraio')
 

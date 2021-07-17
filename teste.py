@@ -4,6 +4,7 @@ import discord.ext.commands
 import os
 import random
 import json
+import Functions as fn
 
 bot = commands.Bot(command_prefix='>')
 
@@ -44,34 +45,35 @@ async def play(ctx, url:str):
 @bot.command()
 async def rplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
-    random_song = random.choice(os.listdir(big_audio_files))
-    if voice_channel is not None and not is_connected(ctx):
+    random_song = fn.find_random_audio(big_audio_files)
+    if voice_channel is not None and not fn.is_connected(ctx):
         await voice_channel.connect()
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-        voice.play(discord.FFmpegPCMAudio(f'{big_audio_files}/{random_song}'))
-        await ctx.send(f'Aleatório escolhido: {random_song}')
-    elif is_connected(ctx):
-        try:
-            voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-            voice.play(discord.FFmpegPCMAudio(f'{big_audio_files}/{random_song}'))
-            await ctx.send(f'Aleatório escolhido: {random_song}')
-        except:
-            voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-            voice.stop()
-            voice.play(discord.FFmpegPCMAudio(f'{big_audio_files}/{random_song}'))
-            await ctx.send(f'Aleatório escolhido: {random_song}')
+        voice.play(discord.FFmpegPCMAudio(random_song))
+        await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
+        return
+    if fn.is_connected(ctx):
+        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+        if not voice.is_playing():
+            voice.play(discord.FFmpegPCMAudio(random_song))
+            await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
+            return
+        voice.stop()
+        voice.play(discord.FFmpegPCMAudio(random_song))
+        await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
+        return
 
 
 @bot.command()
 async def rrplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
     random_song = random.choice(os.listdir(random_accel_audio_files))
-    if voice_channel is not None and not is_connected(ctx):
+    if voice_channel is not None and not fn.is_connected(ctx):
         await voice_channel.connect()
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
         voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
         await ctx.send(f'Aleatório escolhido: {random_song}')
-    elif is_connected(ctx):
+    elif fn.is_connected(ctx):
         try:
             voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
             voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
@@ -81,11 +83,6 @@ async def rrplay(ctx):
             voice.stop()
             voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
             await ctx.send(f'Aleatório escolhido: {random_song}')
-
-
-def is_connected(ctx):
-    voice_client = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
-    return voice_client and voice_client.is_connected()
 
 
 @bot.command()

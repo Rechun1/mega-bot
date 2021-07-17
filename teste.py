@@ -5,8 +5,11 @@ import os
 import random
 import json
 import Functions as fn
+import asyncio
 
-bot = commands.Bot(command_prefix='>')
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='>', intents=intents)
 
 ROOT_PATH = os.curdir
 audio_files = f'{ROOT_PATH}/audio/'
@@ -14,8 +17,7 @@ big_audio_files = 'E:/playlist_skype_full/'
 random_audio_files = 'E:/Playlist Skype/'
 random_accel_audio_files = 'E:/Playlist Skype2x/'
 random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
-#TODO: comando que toca ayrton senna
-#TODO: comando professor pasquale NÃO
+
 pregadas = 0
 
 
@@ -67,23 +69,72 @@ async def rplay(ctx):
 @bot.command()
 async def rrplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
-    random_song = random.choice(os.listdir(random_accel_audio_files))
+    random_song = fn.find_random_audio(random_accel_big_audio_files)
+    print(random_song)
     if voice_channel is not None and not fn.is_connected(ctx):
         await voice_channel.connect()
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-        voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
-        await ctx.send(f'Aleatório escolhido: {random_song}')
-    elif fn.is_connected(ctx):
-        try:
-            voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-            voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
-            await ctx.send(f'Aleatório escolhido: {random_song}')
-        except:
-            voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-            voice.stop()
-            voice.play(discord.FFmpegPCMAudio(f'{random_accel_big_audio_files}/{random_song}'))
-            await ctx.send(f'Aleatório escolhido: {random_song}')
+        voice.play(discord.FFmpegPCMAudio(random_song))
+        await ctx.send(f'Aleatório escolhido: {random_song.split}')
+        return
+    if fn.is_connected(ctx):
+        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+        if not voice.is_playing():
+            voice.play(discord.FFmpegPCMAudio(random_song))
+            await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
+            return
+        voice.stop()
+        voice.play(discord.FFmpegPCMAudio(random_song))
+        await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
+        return
 
+
+@bot.command()
+async def splay(ctx, song_to_play=None):
+    if not song_to_play:
+        await ctx.send(f'Escolhe um audio pra eu tocar, burro!\nSe não souber as opções, digite >audio')
+        return
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
+    song_file = f'{random_audio_files}special_audio/{song_to_play}.mp3'
+    if not os.path.exists(song_file):
+        return await ctx.send(f'Esse audio não existe, burro!\nNão sabe os audios que existem né? digite >audio')
+    audio = discord.FFmpegPCMAudio(song_file)
+    if voice_channel is not None and not fn.is_connected(ctx):
+        await voice_channel.connect()
+    voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+    if not voice.is_playing():
+        voice.play(audio)
+        return
+    voice.stop()
+    voice.play(audio)
+    return
+
+
+@bot.command()
+async def audio(ctx):
+    spec_song_files = os.listdir(f'{random_audio_files}special_audio/')
+    spec_final_song_files = []
+    for song in spec_song_files:
+        new_name = song.replace('.mp3', '')
+        spec_final_song_files.append(new_name)
+    return await ctx.send(f'As opções são: {", ".join(spec_final_song_files)}')
+
+
+@bot.command()
+async def mnt(ctx, name):
+    channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel), type=discord.ChannelType.voice)
+    members = channel.members
+    for member in members:
+        if member.name == name:
+            try:
+                await ctx.send(f'Minutinho aplicado em: {member.display_name}, logo tá de volta')
+                await member.edit(mute=True)
+                await asyncio.sleep(5)
+                await member.edit(mute=False)
+                return
+            except:
+                return await ctx.send(f'Erro ao aplicar minutinho em: {member.display_name}')
+    await ctx.send('Deu pau aqui irmão, acho que o usuário não está aí')
 
 @bot.command()
 async def stop(ctx):
@@ -119,5 +170,6 @@ async def nail(ctx):
 async def guinf(ctx):
     user = ctx.author.display_name
     await ctx.send(f'Olá {str(user)}, o Guinf é macho')
+
 
 bot.run('ODY0MjY4MTcyMzY1NjYwMjAw.YOy-dQ.gM6ksIhcrWss2ai4uyjOaoRV12M')

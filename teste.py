@@ -121,7 +121,7 @@ async def audio(ctx):
 
 
 @bot.command()
-async def mnt(ctx, name):
+async def mnt(ctx, name, time):
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel), type=discord.ChannelType.voice)
     members = channel.members
     for member in members:
@@ -129,12 +129,13 @@ async def mnt(ctx, name):
             try:
                 await ctx.send(f'Minutinho aplicado em: {member.display_name}, logo tá de volta')
                 await member.edit(mute=True)
-                await asyncio.sleep(5)
+                await asyncio.sleep(int(time))
                 await member.edit(mute=False)
                 return
-            except:
-                return await ctx.send(f'Erro ao aplicar minutinho em: {member.display_name}')
+            except Exception as e:
+                return await ctx.send(f'Erro ao aplicar minutinho em: {member.display_name}: {e}')
     await ctx.send('Deu pau aqui irmão, acho que o usuário não está aí')
+
 
 @bot.command()
 async def stop(ctx):

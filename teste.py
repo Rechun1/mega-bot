@@ -130,6 +130,8 @@ async def mnt(ctx, name, time):
             for role in ctx.author.roles:
                 if role.name == 'Patrão Chipart':
                     try:
+                        if member.voice.mute:
+                            return await ctx.send(f'Calma irmão, não é assim! {member.display_name} já está mutado')
                         await ctx.send(f'Minutinho aplicado em: {member.display_name}, logo tá de volta')
                         await member.edit(mute=True)
                         await asyncio.sleep(time_value)

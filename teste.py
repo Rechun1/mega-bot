@@ -127,7 +127,7 @@ async def mnt(ctx, name, time):
     time_value = int(time)
     for member in members:
         if member.name == name:
-            for role in member.roles:
+            for role in ctx.author.roles:
                 if role.name == 'Patrão Chipart':
                     try:
                         await ctx.send(f'Minutinho aplicado em: {member.display_name}, logo tá de volta')

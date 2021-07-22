@@ -6,6 +6,7 @@ import random
 import json
 import Functions as fn
 import asyncio
+from loguru import logger as lg
 
 intents = discord.Intents.default()
 intents.members = True
@@ -17,6 +18,7 @@ big_audio_files = 'E:/playlist_skype_full/'
 random_audio_files = 'E:/Playlist Skype/'
 random_accel_audio_files = 'E:/Playlist Skype2x/'
 random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
+img_files = f'{ROOT_PATH}/img/'
 
 pregadas = 0
 
@@ -185,5 +187,16 @@ async def guinf(ctx):
     user = ctx.author.display_name
     await ctx.send(f'Olá {str(user)}, o Guinf é macho')
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.author.name != 'Guimeca':
+        await bot.process_commands(message)
+        return
+
+    file = f'{img_files}/selo.png'
+    await message.channel.send(file=discord.File(file))
 
 bot.run('ODY0MjY4MTcyMzY1NjYwMjAw.YOy-dQ.gM6ksIhcrWss2ai4uyjOaoRV12M')

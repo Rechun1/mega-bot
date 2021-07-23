@@ -194,6 +194,7 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
+    await bot.process_commands(message)
     file = f'{img_files}selo.png'
     await message.channel.send(file=discord.File(file))
 

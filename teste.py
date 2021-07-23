@@ -6,18 +6,20 @@ import random
 import json
 import Functions as fn
 import asyncio
+from loguru import logger as lg
+from dotenv import load_dotenv
 
 intents = discord.Intents.default()
 intents.members = True
 bot = commands.Bot(command_prefix='>', intents=intents)
 
-ROOT_PATH = os.curdir
+ROOT_PATH = 'C:/Users/Pedro/Desktop/mega-bot'
 audio_files = f'{ROOT_PATH}/audio/'
 big_audio_files = 'E:/playlist_skype_full/'
 random_audio_files = 'E:/Playlist Skype/'
 random_accel_audio_files = 'E:/Playlist Skype2x/'
 random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
-img_files = 'C:/Users/Pedro/Desktop/mega-bot/img/'
+img_files = f'{ROOT_PATH}/img/'
 pregadas = 0
 
 
@@ -28,32 +30,12 @@ def pregar():
 
 
 @bot.command()
-async def play(ctx, url:str):
-    channel_name = ctx.author.voice.channel
-    await ctx.send(f'Nome do canal: {channel_name}, pesquisa: {url}')
-    print(channel_name)
-    voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
-    print(voice_channel)
-    if voice_channel is not None:
-        try:
-            await voice_channel.connect()
-            voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-            print(voice)
-            voice.play(discord.FFmpegPCMAudio(f'{audio_files}/mcgorila2.mp3'))
-        except:
-            await ctx.send(f'Deu erro aqui caraio')
-
-
-@bot.command()
 async def rplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
     random_song = fn.find_random_audio(big_audio_files)
+    lg.info(f'Aleatório escolhido normal: {random_song.split("/")[2]}')
     if voice_channel is not None and not fn.is_connected(ctx):
         await voice_channel.connect()
-        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-        voice.play(discord.FFmpegPCMAudio(random_song))
-        await ctx.send(f'Aleatório escolhido: {random_song.split("/")[2]}')
-        return
     if fn.is_connected(ctx):
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
         if not voice.is_playing():
@@ -70,13 +52,9 @@ async def rplay(ctx):
 async def rrplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))
     random_song = fn.find_random_audio(random_accel_big_audio_files)
-    print(random_song)
+    lg.info(f'Aleatório escolhido acelerado: {random_song.split("/")[2]}')
     if voice_channel is not None and not fn.is_connected(ctx):
         await voice_channel.connect()
-        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
-        voice.play(discord.FFmpegPCMAudio(random_song))
-        await ctx.send(f'Aleatório escolhido: {random_song.split}')
-        return
     if fn.is_connected(ctx):
         voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
         if not voice.is_playing():
@@ -180,11 +158,6 @@ async def nail(ctx):
     await ctx.send(f'A tábua já foi pregada {str(pregar())} vezes desde que estou online.')
 
 
-@bot.command()
-async def guinf(ctx):
-    user = ctx.author.display_name
-    await ctx.send(f'Olá {str(user)}, o Guinf é macho')
-
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -195,7 +168,9 @@ async def on_message(message):
         return
 
     await bot.process_commands(message)
+    lg.info(f'Enviando selo')
     file = f'{img_files}selo.png'
     await message.channel.send(file=discord.File(file))
 
-bot.run('ODY0MjY4MTcyMzY1NjYwMjAw.YOy-dQ.gM6ksIhcrWss2ai4uyjOaoRV12M')
+load_dotenv(dotenv_path=f'{ROOT_PATH}/.env')
+bot.run(os.getenv('bot_key'))

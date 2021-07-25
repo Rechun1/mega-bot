@@ -144,6 +144,7 @@ async def smnt(ctx, name, time):
                         if os.path.exists(f'{text_files_path}/users/{member.name}.txt'):
                             fn.write_to_file(f'{text_files_path}/users/{member.name}.txt', 'w', str(time))
                             return await ctx.send(f'Tempo base para {member.display_name} setado para {time} segundos')
+                        return await ctx.send(f'Arquivo do usuário {member.display_name} não encontrado. Acho que nunca tomou minutinho automatico.')
                     except:
                         return await ctx.send(f'Erro ao alterar tempo base para o usuário {member.display_name}')
             return await ctx.send(f'Você não tem permissão para isso, mamou!')

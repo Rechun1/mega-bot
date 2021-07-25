@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 
 /audio/
-/files/
+files/users/
+files/mnt_log.txt
 .idea/

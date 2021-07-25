@@ -23,3 +23,13 @@ def find_random_audio(location):
         return f'{location}{random_audio}'
     except Exception as e:
         lg.error(f'Erro ao encontrar um arquivo de audio aleatório: {e}')
+
+
+def write_to_file(file_path, mode, content):
+    with open(file_path, mode) as e:
+        e.write(content)
+
+
+def get_int_from_file(file_path):
+    with open(file_path, 'r') as e:
+        return int(e.read())

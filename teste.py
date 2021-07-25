@@ -4,10 +4,11 @@ import discord.ext.commands
 import os
 import random
 import json
-import Functions as fn
+import functions as fn
 import asyncio
 from loguru import logger as lg
 from dotenv import load_dotenv
+import datetime
 
 intents = discord.Intents.default()
 intents.members = True
@@ -20,6 +21,7 @@ random_audio_files = 'E:/Playlist Skype/'
 random_accel_audio_files = 'E:/Playlist Skype2x/'
 random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
 img_files = f'{ROOT_PATH}/img/'
+text_files_path = f'{ROOT_PATH}/files'
 pregadas = 0
 
 
@@ -99,7 +101,9 @@ async def audio(ctx):
 
 
 @bot.command()
-async def mnt(ctx, name, time):
+async def mnt(ctx, name, time=None):
+    if time is None:
+        time = 60
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel), type=discord.ChannelType.voice)
     members = channel.members
     time_value = int(time)
@@ -110,7 +114,8 @@ async def mnt(ctx, name, time):
                     try:
                         if member.voice.mute:
                             return await ctx.send(f'Calma irmão, não é assim! {member.display_name} já está mutado')
-                        await ctx.send(f'Minutinho aplicado em: {member.display_name}, logo tá de volta')
+                        await ctx.send(f'Minutinho de {time_value} segundos aplicado em: **{member.display_name}**, logo tá de volta')
+                        fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.datetime.now()} -- minutinho de {time_value} segundos aplicado em {member.name}\n')
                         await member.edit(mute=True)
                         await asyncio.sleep(time_value)
                         await member.edit(mute=False)
@@ -147,7 +152,7 @@ async def dc(ctx):
 
 @bot.command()
 async def rule(ctx):
-    with open(f'{ROOT_PATH}/rules/rules.json') as e:
+    with open(f'{ROOT_PATH}/files/rules.json') as e:
         rules = json.load(e)
     rule = random.choice(rules['rules'])
     await ctx.send(rule)

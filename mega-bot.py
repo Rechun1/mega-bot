@@ -25,9 +25,9 @@ async def on_message(message):
         await message.channel.send(file=discord.File(f'{img_files}/{file}'))
 
     if message.content.startswith('rr'):
-        with open(f'{ROOT_PATH}/rules/rules.json') as e:
+        with open(f'{ROOT_PATH}/files/files.json') as e:
             rules = json.load(e)
-        rule = random.choice(rules['rules'])
+        rule = random.choice(rules['files'])
         await message.channel.send(rule)
 
 @client.event

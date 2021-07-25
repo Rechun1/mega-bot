@@ -102,35 +102,51 @@ async def audio(ctx):
 
 @bot.command()
 async def mnt(ctx, name, time=None):
-    if time is None:
-        time = 60
-    channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel), type=discord.ChannelType.voice)
+    channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
+                                type=discord.ChannelType.voice)
     members = channel.members
-    time_value = int(time)
     for member in members:
         if member.name == name:
             for role in ctx.author.roles:
                 if role.name == 'Patrão Chipart':
                     try:
-                        if member.voice.mute:
-                            return await ctx.send(f'Calma irmão, não é assim! {member.display_name} já está mutado')
+                        # if member.voice.mute:
+                        #     return await ctx.send(f'Calma irmão, não é assim! {member.display_name} já está mutado')
+                        if time is None:
+                            if not os.path.exists(f'{text_files_path}/users/{member.name}.txt'):
+                                fn.write_to_file(f'{text_files_path}/users/{member.name}.txt', 'w', '60')
+                            time_value = fn.get_int_from_file(f'{text_files_path}/users/{member.name}.txt')
+                            fn.write_to_file(f'{text_files_path}/users/{member.name}.txt', 'w', str(time_value + 10))
+                        else:
+                            time_value = int(time)
                         await ctx.send(f'Minutinho de {time_value} segundos aplicado em: **{member.display_name}**, logo tá de volta')
-                        fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.datetime.now()} -- minutinho de {time_value} segundos aplicado em {member.name}\n')
+                        fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{member.name}\n')
                         await member.edit(mute=True)
                         await asyncio.sleep(time_value)
                         await member.edit(mute=False)
                         return
                     except Exception as e:
                         return await ctx.send(f'Erro ao aplicar minutinho em: {member.display_name}: {e}')
-            await ctx.send('Você não tem permissão para isso, agora toma dobrado!')
-            if time_value < 30:
-                time_value = 30
-                await ctx.send(f'Tá achando oq maluco? Tá tentando me sacanear? Vai ficar {time_value * 2} segundos quietinho aí!')
-            await ctx.author.edit(mute=True)
-            await asyncio.sleep(int(time_value * 2))
-            await ctx.author.edit(mute=False)
-            return await ctx.send('Bom pra aprender.')
+            return await ctx.send('Você não tem permissão para isso, mamou!')
     await ctx.send('Deu pau aqui irmão, acho que o usuário não está aí')
+
+
+@bot.command()
+async def smnt(ctx, name, time):
+    channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
+                                type=discord.ChannelType.voice)
+    members = channel.members
+    for member in members:
+        if member.name == name:
+            for role in ctx.author.roles:
+                if role.name == 'Patrão Chipart':
+                    try:
+                        if os.path.exists(f'{text_files_path}/users/{member.name}.txt'):
+                            fn.write_to_file(f'{text_files_path}/users/{member.name}.txt', 'w', str(time))
+                            return await ctx.send(f'Tempo base para {member.display_name} setado para {time} segundos')
+                    except:
+                        return await ctx.send(f'Erro ao alterar tempo base para o usuário {member.display_name}')
+            return await ctx.send(f'Você não tem permissão para isso, mamou!')
 
 
 @bot.command()
@@ -154,8 +170,8 @@ async def dc(ctx):
 async def rule(ctx):
     with open(f'{ROOT_PATH}/files/rules.json') as e:
         rules = json.load(e)
-    rule = random.choice(rules['rules'])
-    await ctx.send(rule)
+    found_rule = random.choice(rules['rules'])
+    await ctx.send(found_rule)
 
 
 @bot.command()

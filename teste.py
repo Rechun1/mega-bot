@@ -101,7 +101,9 @@ async def audio(ctx):
 
 
 @bot.command()
-async def mnt(ctx, name, time=None):
+async def mnt(ctx, name=None, time=None):
+    if name is None:
+        name = 'Guimeca'
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
                                 type=discord.ChannelType.voice)
     members = channel.members

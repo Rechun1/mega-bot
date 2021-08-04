@@ -31,6 +31,12 @@ def pregar():
     return pregadas
 
 
+@bot.event
+async def on_ready():
+    lg.success(f'Bot iniciado com sucesso...')
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='o Gui falar merda'))
+
+
 @bot.command()
 async def rplay(ctx):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel))

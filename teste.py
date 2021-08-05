@@ -109,7 +109,7 @@ async def audio(ctx):
 @bot.command()
 async def mnt(ctx, name=None, time=None):
     if name is None:
-        name = 'Guimeca'
+        name = 'GuiMeca'
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
                                 type=discord.ChannelType.voice)
     members = channel.members
@@ -193,7 +193,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.author.name != 'Guimeca':
+    if str(message.author.id) != '277572928583761920':
         await bot.process_commands(message)
         return
 

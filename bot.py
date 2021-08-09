@@ -107,7 +107,7 @@ async def audio(ctx):
 
 
 @bot.command()
-async def mnt(ctx, name=None, time=None):
+async def mnt2(ctx, name=None, time=None):
     if name is None:
         name = 'GuiMeca'
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
@@ -137,6 +137,36 @@ async def mnt(ctx, name=None, time=None):
                         return await ctx.send(f'Erro ao aplicar minutinho em: {member.display_name}: {e}')
             return await ctx.send('Você não tem permissão para isso, mamou!')
     await ctx.send('Deu pau aqui irmão, acho que o usuário não está aí')
+
+
+@bot.command()
+async def mnt(ctx, name=None, time=None, id=277572928583761920):
+
+    user_roles = [role.name for role in ctx.author.roles]
+    if 'Patrão Chipart' not in user_roles:
+        return await ctx.send('Não tem permissão, mamou!')
+
+    if name is None:
+        member = discord.utils.get(ctx.guild.members, id=id)
+    else:
+        member = discord.utils.get(ctx.guild.members, name=name)
+
+    if member is None:
+        return await ctx.send(f'Usuário não encontrado')
+
+    if time is None:
+        if not os.path.exists(f'{text_files_path}/users/{member.id}.txt'):
+            fn.write_to_file(f'{text_files_path}/users/{member.id}.txt', 'w', '60')
+        time_value = fn.get_int_from_file(f'{text_files_path}/users/{member.id}.txt')
+        fn.write_to_file(f'{text_files_path}/users/{member.id}.txt', 'w', str(time_value + 10))
+    else:
+        time_value = int(time)
+    await ctx.send(f'Minutinho de {time_value} aplicado em **{member.display_name}**, logo tá de volta')
+    fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{member.display_name}')
+    await member.edit(mute=True)
+    await asyncio.sleep(time_value)
+    await member.edit(mute=False)
+    return
 
 
 @bot.command()

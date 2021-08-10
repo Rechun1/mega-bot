@@ -22,13 +22,6 @@ random_accel_audio_files = 'E:/Playlist Skype2x/'
 random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
 img_files = f'{ROOT_PATH}/img/'
 text_files_path = f'{ROOT_PATH}/files'
-pregadas = 0
-
-
-def pregar():
-    global pregadas
-    pregadas += 1
-    return pregadas
 
 
 @bot.event
@@ -138,7 +131,7 @@ async def mnt(ctx, name=None, time=None, id=277572928583761920):
 
 
 @bot.command()
-async def smnt(ctx, name, time):
+async def smnt_old(ctx, name, time):
     channel = discord.utils.get(ctx.guild.voice_channels, name=str(ctx.author.voice.channel),
                                 type=discord.ChannelType.voice)
     members = channel.members
@@ -155,6 +148,12 @@ async def smnt(ctx, name, time):
                         return await ctx.send(f'Erro ao alterar tempo base para o usuário {member.display_name}')
             return await ctx.send(f'Você não tem permissão para isso, mamou!')
 
+
+@bot.command()
+async def smnt(ctx, name, time):
+    user_roles = [role.name for role in ctx.author.roles]
+    if "Patrão Chipart" not in user_roles:
+        return await ctx.send('Você não tem permissão para isso, mamou!')
 
 @bot.command()
 async def stop(ctx):
@@ -179,11 +178,6 @@ async def rule(ctx):
         rules = json.load(e)
     found_rule = random.choice(rules['rules'])
     await ctx.send(found_rule)
-
-
-@bot.command()
-async def nail(ctx):
-    await ctx.send(f'A tábua já foi pregada {str(pregar())} vezes desde que estou online.')
 
 
 @bot.event

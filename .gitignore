@@ -131,4 +131,5 @@ dmypy.json
 /audio/
 files/users/
 files/mnt_log.txt
+files/user_dict.json
 .idea/

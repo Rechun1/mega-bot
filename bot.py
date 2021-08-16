@@ -27,6 +27,8 @@ text_files_path = f'{ROOT_PATH}/files'
 @bot.event
 async def on_ready():
     lg.success(f'Bot iniciado com sucesso...')
+    channel = bot.get_channel(277591138309767168)
+    await channel.send('Cheguei maluco, **bora lol** <@596855744372932610> <@277567014225182740> <@476446211956801546> <@277593759213027328> <@214170541316112384>')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='o Gui falar merda'))
 
 

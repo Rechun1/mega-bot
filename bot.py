@@ -123,7 +123,7 @@ async def mnt(ctx, name=None, time=None, id=277572928583761920):
         time_value = int(time)
     await ctx.send(f'Minutinho de {time_value} aplicado em **{member.display_name}**, logo tá de volta')
     lg.info(f'Minutinho de {time_value} aplicado em {member.display_name}')
-    fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{member.display_name}')
+    fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{member.display_name}\n')
     await member.edit(mute=True)
     await asyncio.sleep(time_value)
     await member.edit(mute=False)

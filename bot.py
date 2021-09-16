@@ -4,6 +4,7 @@ import discord.ext.commands
 import os
 import random
 import json
+
 import functions as fn
 import asyncio
 from loguru import logger as lg
@@ -28,8 +29,14 @@ text_files_path = f'{ROOT_PATH}/files'
 async def on_ready():
     lg.success(f'Bot iniciado com sucesso...')
     channel = bot.get_channel(277591138309767168)
-    await channel.send('Cheguei maluco, **bora lol** <@596855744372932610> <@277567014225182740> <@476446211956801546> <@277593759213027328> <@214170541316112384>')
+    await channel.send('Cheguei maluco, **bora lol** <@596855744372932610> <@277567014225182740> <@476446211956801546> <@277593759213027328> <@214170541316112384>\n'
+                       'Powered by Minutinho engine v1.2')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='o Gui falar merda'))
+
+
+@bot.command()
+async def test(ctx):
+    await fn.find_and_connect_to_vc(ctx)
 
 
 @bot.command()
@@ -110,8 +117,14 @@ async def mnt(ctx, name=None, time=None, id=277572928583761920):
 
     if name is None:
         member = discord.utils.get(ctx.guild.members, id=id)
+        name = 'gui'
     else:
-        member = discord.utils.get(ctx.guild.members, name=name)
+        users = fn.read_json_file(f'files/user_dict.json')
+        try:
+            member = discord.utils.get(ctx.guild.members, id=users[name])
+        except KeyError:
+            member = discord.utils.get(ctx.guild.members, name=str(name))
+            name = member.display_name
 
     if member is None:
         return await ctx.send(f'Deu pau aqui irmão, usuário não encontrado')
@@ -123,9 +136,13 @@ async def mnt(ctx, name=None, time=None, id=277572928583761920):
         fn.write_to_file(f'{text_files_path}/users/{member.id}.txt', 'w', str(time_value + 10))
     else:
         time_value = int(time)
-    await ctx.send(f'Minutinho de {time_value} aplicado em **{member.display_name}**, logo tá de volta')
-    lg.info(f'Minutinho de {time_value} aplicado em {member.display_name}')
-    fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{member.display_name}\n')
+    try:
+        await ctx.send(f'Minutinho de {time_value} aplicado em **{name}**, logo tá de volta')
+    except:
+        await ctx.send(f'Minutinho de {time_value} aplicado em algum corno com nome fudido, logo tá de volta')
+    clean_display_name = fn.remoji(member.display_name)
+    lg.info(f'Minutinho de {time_value} aplicado em {name}')
+    fn.write_to_file(f'{text_files_path}/mnt_log.txt', 'a', f'{datetime.date.today()};{time_value};{clean_display_name}\n')
     await member.edit(mute=True)
     await asyncio.sleep(time_value)
     await member.edit(mute=False)
@@ -156,6 +173,7 @@ async def smnt(ctx, name, time):
     user_roles = [role.name for role in ctx.author.roles]
     if "Patrão Chipart" not in user_roles:
         return await ctx.send('Você não tem permissão para isso, mamou!')
+
 
 @bot.command()
 async def stop(ctx):

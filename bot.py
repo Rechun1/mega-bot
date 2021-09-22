@@ -10,6 +10,7 @@ import asyncio
 from loguru import logger as lg
 from dotenv import load_dotenv
 import datetime
+import youtube_dl
 
 intents = discord.Intents.default()
 intents.members = True
@@ -30,13 +31,34 @@ async def on_ready():
     lg.success(f'Bot iniciado com sucesso...')
     channel = bot.get_channel(277591138309767168)
     await channel.send('Cheguei maluco, **bora lol** <@596855744372932610> <@277567014225182740> <@476446211956801546> <@277593759213027328> <@214170541316112384>\n'
-                       'Powered by Minutinho engine v1.2')
+                       'Powered by Minutinho engine v1.2\n'
+                       'Music player v1.1(pre-alpha)')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name='o Gui falar merda'))
 
 
 @bot.command()
 async def test(ctx):
     await fn.find_and_connect_to_vc(ctx)
+
+
+@bot.command()
+async def play(ctx, url):
+    if ctx.author.display_name == 'Manda Chupa':
+        title = fn.download_file(url)
+
+        if not fn.is_connected(ctx):
+            await fn.find_and_connect_to_vc(ctx)
+        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+        lg.info(voice)
+        lg.info(f'{ROOT_PATH}/audiotests/{title}.mp3')
+        if not voice.is_playing():
+            source_audio = discord.FFmpegPCMAudio(f'{ROOT_PATH}/audiotests/{title}.mp3')
+            voice.play(source_audio, after=fn.check_song_list())
+            return
+        voice.stop()
+        voice.play(discord.FFmpegPCMAudio(f'{ROOT_PATH}/audiotests/{title}.mp3'))
+    else:
+        lg.info('Tentou tocar mas n pode')
 
 
 @bot.command()
@@ -119,7 +141,7 @@ async def mnt(ctx, name=None, time=None, id=277572928583761920):
         member = discord.utils.get(ctx.guild.members, id=id)
         name = 'gui'
     else:
-        users = fn.read_json_file(f'files/user_dict.json')
+        users = fn.read_json_file(f'{text_files_path}/user_dict.json')
         try:
             member = discord.utils.get(ctx.guild.members, id=users[name])
         except KeyError:

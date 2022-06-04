@@ -25,7 +25,7 @@ random_accel_big_audio_files = 'E:/playlist_skype_full2x/'
 img_files = f'{ROOT_PATH}/img/'
 text_files_path = f'{ROOT_PATH}/files'
 
-
+print('megabosta')
 @bot.event
 async def on_ready():
     lg.success(f'Bot iniciado com sucesso...')
